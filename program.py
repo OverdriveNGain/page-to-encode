@@ -10,6 +10,20 @@ import keyboard
 # import msvcrt
 
 pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+Attempt_to_combine_lines = True
+
+def parse_true_or_false(s):
+    return s.lower() in ['true', 'yes', 'y', 't']
+
+print()
+for line in open('options.txt', 'r').readlines():
+    if not '=' in line:
+        continue
+    tokens = line.split("=")
+    if tokens[0].strip() == 'Attempt_to_combine_lines':
+        Attempt_to_combine_lines = parse_true_or_false(tokens[1].strip())
+        print(f"Option detected: Attempt_to_combine_lines set to {Attempt_to_combine_lines}")
+print()
 
 def save_string_to_word_file(text, filename):
     # Create a new Word document
@@ -69,19 +83,21 @@ def process_files():
         # Extract text
         text = extract_text_from_image(input_file_path)
         # Remove possible unnecessary newlines
-        textlines = text.split("\n")
-        i = 0
-        while (i < len(textlines) - 1):
-            if (i == len(textlines) - 1):
-                break
+        if (Attempt_to_combine_lines):
+            textlines = text.split("\n")
+            i = 0
+            while (i < len(textlines) - 1):
+                if (i == len(textlines) - 1):
+                    break
 
-            if (len(textlines[i]) > 0 and len(textlines[i + 1]) > 0 and textlines[i][-1].islower() and textlines[i+1][0].islower()):
-                textlines[i] = textlines[i] + ' ' + textlines[i+1]
-                del textlines[i+1]
-            
-            i += 1
+                if (len(textlines[i]) > 0 and len(textlines[i + 1]) > 0 and textlines[i][-1].islower() and textlines[i+1][0].islower()):
+                    textlines[i] = textlines[i] + ' ' + textlines[i+1]
+                    del textlines[i+1]
+                
+                i += 1
+            text = "\n".join(textlines)
         # Save to word file
-        save_string_to_word_file("\n".join(textlines), output_file_path)
+        save_string_to_word_file(text, output_file_path)
         print(f"Saved to {output_file_path}")
 
 def on_press(key):
