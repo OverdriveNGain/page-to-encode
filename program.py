@@ -25,11 +25,12 @@ for line in open('options.txt', 'r').readlines():
         print(f"Option detected: Attempt_to_combine_lines set to {Attempt_to_combine_lines}")
 print()
 
-def save_string_to_word_file(text, filename):
+def save_string_to_word_file(text, filename, image_path):
     # Create a new Word document
     document = Document()
     # Add the string as a paragraph to the document
     document.add_paragraph(text)
+    document.add_picture(image_path)
     # Save the document to the specified file
     document.save(filename)
 
@@ -97,7 +98,7 @@ def process_files():
                 i += 1
             text = "\n".join(textlines)
         # Save to word file
-        save_string_to_word_file(text, output_file_path)
+        save_string_to_word_file(text, output_file_path, input_file_path)
         print(f"Saved to {output_file_path}")
 
 def on_press(key):
