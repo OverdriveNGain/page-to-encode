@@ -1,0 +1,61 @@
+body, html {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0px;
+    margin: 0px;
+}
+
+#imageholder {
+    background-color: rgb(214, 214, 214);
+    display: inline-block;
+    width: 800px;
+    height: 1000px;
+    position: relative;
+}
+
+#imagedisplay {
+    object-fit: contain;
+    width: 100%;
+    height: 100%
+}
+
+#sketch {
+    position:absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.sidebyside {
+    display:flex;
+    flex-direction: row;
+}
+
+#controlsrow {
+    position: sticky;
+    position: -webkit-sticky; /* Safari */
+    top: 0;
+    background-color: rgb(244, 255, 144);
+    z-index: 10;
+    padding: 10px;
+}
+
+#controlsrow #contents {
+    display:flex;
+    flex-direction: row;
+    background-color: rgb(244, 255, 144);
+}
+
+#controlsrow #contents button{
+    margin-right: 5px;
+}
+
+#controlsrow #contents button.reset{
+    background-color: rgb(255, 198, 198);
+
+}
+
+
+#texttocopy {
+    padding-left: 10px;
+}

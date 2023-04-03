@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js" integrity="sha512-3RlxD1bW34eFKPwj9gUXEWtdSMC59QqIqHnD8O/NoTwSJhgxRizdcFVQhUMFyTp5RwLTDL0Lbcqtl8b7bFAzog==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="sketch.js" id="sketch"></script>
+
+    <title>Image Text Extractor</title>
+</head>
+<body>
+    <div id="controlsrow">
+        <div id="contents">
+            <input type="file" id="file_input" onchange="onfilepick(event)">
+            <button onclick="ongeneratecallback()" id="generatebtn">Generate</button>
+            <button onclick="newlinecallback()" id="newlinebtn">New Line</button>
+            <button class="reset" onclick="onresetcallback('left')" id="generatebtn">◀ Reset Left</button>
+            <button class="reset" onclick="onresetcallback('right')" id="generatebtn">Reset Right ▶</button>
+            <button class="reset" onclick="onresetcallback('all')" id="generatebtn">Reset All 😱</button>
+            <button onclick="copyrightcallback()" id="copybtn">Copy Right 📋</button>
+        </div>
+    </div>
+    
+    <div class="sidebyside">
+        <div id="imageholder">
+            <img src="" alt="" id="imagedisplay">
+        </div>
+        <!-- <div contenteditable="true" spellcheck="true" id="texttocopy" style="flex: 1">
+             
+        </div>  -->
+        <textarea contenteditable="true" spellcheck="true" id="texttocopy" style="flex: 1"></textarea> 
+        <!-- <highlights>
+            <div>
+                <div style="position: fixed; top: 31px; left: 47px; width: 15px; height: 3px; background: rgba(255, 0, 0, 0.5);" />
+                <div style="position: fixed; top: 31px; left: 168px; width: 45px; height: 3px; background: rgba(255, 0, 0, 0.5);" />
+            </div>
+        </highlights> -->
+    </div>
+    
+    <script>
+        function onfilepick(e){
+            var input = event.target;
+			var reader = new FileReader();
+			reader.onload = function(){
+				var dataURL = reader.result;
+				var output = document.querySelector('#imagedisplay');
+                console.log(output)
+				output.src = dataURL;
+			};
+			reader.readAsDataURL(input.files[0]);
+
+            const image = new Image();
+            image.onload = function() {
+                addImageData(this.width, this.height);
+            }
+            image.src = URL.createObjectURL(input.files[0]);
+        }
+
+        function ongeneratecallback(){
+            document.querySelector('#generatebtn').disabled = true;
+            document.querySelector('#file_input').disabled = true;
+            var formData = new FormData();
+            formData.append('image', $('#file_input')[0].files[0]);
+            $.ajax({
+                method: 'POST',
+                url: 'https://api.api-ninjas.com/v1/imagetotext',
+                data: formData,
+                enctype: 'multipart/form-data',
+                processData: false,
+                contentType: false, 
+                headers: {
+                    'X-Api-Key': '7bSg3o9Uzf5JHxszsfva1A==eE4mAYJjtg7L0Bkx'
+                },
+                success: function(result) {
+                    console.log(result);
+                    addJsonResponse(result);
+                },
+                error: function ajaxError(jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText);
+                }
+            });
+        }
+
+        function onresetcallback(where){
+            if (where === 'left')
+                boxIToIsSelected = {};
+            else if (where === 'right')
+                document.querySelector('#texttocopy').value = "";
+            else if (where === 'all'){
+                boxIToIsSelected = {};
+                document.querySelector('#texttocopy').value = "";
+            }
+        }
+
+        function newlinecallback() {
+            insertAtCursor(document.querySelector('#texttocopy'), '\n');
+        }
+
+        function copyrightcallback() {
+            var text = document.querySelector('#texttocopy').value;
+            navigator.clipboard.writeText(text).then(function() {
+                console.log('Async: Copying to clipboard was successful!');
+            }, function(err) {
+                console.error('Async: Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
