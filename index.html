@@ -18,33 +18,26 @@
             <input type="file" id="file_input" onchange="onfilepick(event)">
             <button onclick="ongeneratecallback()" id="generatebtn">Generate</button>
             <button onclick="newlinecallback()" id="newlinebtn">New Line</button>
-            <button class="reset" onclick="onresetcallback('left')" id="generatebtn">◀ Reset Left</button>
-            <button class="reset" onclick="onresetcallback('right')" id="generatebtn">Reset Right ▶</button>
-            <button class="reset" onclick="onresetcallback('all')" id="generatebtn">Reset All 😱</button>
+            <button class="reset" onclick="onresetcallback('left')" id="resetleftbtn">◀ Reset Left</button>
+            <button class="reset" onclick="onresetcallback('right')" id="resetrightbtn">Reset Right ▶</button>
+            <button class="reset" onclick="onresetcallback('all')" id="resetallbtn">Reset All 😱</button>
             <button onclick="copyrightcallback()" id="copybtn">Copy Right 📋</button>
+            <button onclick="undocallback()" id="undobtn">Undo ↪</button>
         </div>
     </div>
     
     <div class="sidebyside">
         <div id="imageholder">
-            <img src="" alt="" id="imagedisplay">
+            <img src="" alt="" id="imagedisplay" style="display:none">
         </div>
-        <!-- <div contenteditable="true" spellcheck="true" id="texttocopy" style="flex: 1">
-             
-        </div>  -->
         <textarea contenteditable="true" spellcheck="true" id="texttocopy" style="flex: 1"></textarea> 
-        <!-- <highlights>
-            <div>
-                <div style="position: fixed; top: 31px; left: 47px; width: 15px; height: 3px; background: rgba(255, 0, 0, 0.5);" />
-                <div style="position: fixed; top: 31px; left: 168px; width: 45px; height: 3px; background: rgba(255, 0, 0, 0.5);" />
-            </div>
-        </highlights> -->
     </div>
     
     <script>
         function onfilepick(e){
             var input = event.target;
 			var reader = new FileReader();
+            document.querySelector("#imagedisplay").style.display = '';
 			reader.onload = function(){
 				var dataURL = reader.result;
 				var output = document.querySelector('#imagedisplay');
@@ -61,8 +54,7 @@
         }
 
         function ongeneratecallback(){
-            document.querySelector('#generatebtn').disabled = true;
-            document.querySelector('#file_input').disabled = true;
+            setButtonInteractable(false);
             var formData = new FormData();
             formData.append('image', $('#file_input')[0].files[0]);
             $.ajax({
@@ -78,21 +70,31 @@
                 success: function(result) {
                     console.log(result);
                     addJsonResponse(result);
+                    setButtonInteractable(true);
                 },
                 error: function ajaxError(jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.responseText);
+                    setButtonInteractable(true);
                 }
             });
         }
 
         function onresetcallback(where){
-            if (where === 'left')
+            if (where === 'left'){
                 boxIToIsSelected = {};
-            else if (where === 'right')
+                resetVars()
+            }
+            else if (where === 'right'){
                 document.querySelector('#texttocopy').value = "";
+
+                lastInsertFunctionTextlet = 'jeremymattheudamonthegreat'
+                lastInsertFunctionTextAdded = ''
+                undoStates = []
+                lastSelectionIndex = -1
+            }
             else if (where === 'all'){
-                boxIToIsSelected = {};
                 document.querySelector('#texttocopy').value = "";
+                resetVars()
             }
         }
 
@@ -107,6 +109,21 @@
             }, function(err) {
                 console.error('Async: Could not copy text: ', err);
             });
+        }
+
+        function setButtonInteractable(interactable){
+            document.querySelector('#file_input').disabled = !interactable;
+            document.querySelector('#generatebtn').disabled = !interactable;
+            document.querySelector('#newlinebtn').disabled = !interactable;
+            document.querySelector('#resetleftbtn').disabled = !interactable;
+            document.querySelector('#resetrightbtn').disabled = !interactable;
+            document.querySelector('#resetallbtn').disabled = !interactable;
+            document.querySelector('#copybtn').disabled = !interactable;
+            document.querySelector('#undobtn').disabled = !interactable;
+        }
+
+        function undocallback(){
+            undoDequeue();
         }
     </script>
 </body>

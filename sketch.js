@@ -10,6 +10,42 @@ let imageYOffset = 0;
 let imageScaler = 1;
 let fpsLastSec = 0;
 
+let maxUndoStates = 30;
+let undoStates = [];
+
+function undoRecord(prevText){
+    undoStates.push({
+        'boxIToIsSelected' : JSON.parse(JSON.stringify(boxIToIsSelected)),
+        'lastInsertFunctionText': lastInsertFunctionText, 
+        'lastInsertFunctionTextAdded': lastInsertFunctionTextAdded, 
+        'lastSelectionIndex': lastSelectionIndex,
+        'textValue': prevText
+    });
+    if (undoStates.length > maxUndoStates)
+        undoStates.splice(0, 1);
+}
+
+function undoDequeue(){
+    if (undoStates.length === 0)
+        return;
+
+    let states = undoStates.pop();
+    boxIToIsSelected = JSON.parse(JSON.stringify(states. boxIToIsSelected))
+    lastInsertFunctionText = states.lastInsertFunctionText
+    lastInsertFunctionTextAdded = states.lastInsertFunctionTextAdded
+    lastSelectionIndex = states.lastSelectionIndex
+    document.querySelector('#texttocopy').value = states.textValue
+}
+
+function resetVars() {
+    boxIToIsSelected = {}
+    
+    lastInsertFunctionTextlet = 'jeremymattheudamonthegreat'
+    lastInsertFunctionTextAdded = ''
+    undoStates = []
+    lastSelectionIndex = -1
+}
+
 function setup(){
     let cnv = createCanvas(canvasWidth, canvasHeight);
     cnv.parent('imageholder');
@@ -79,15 +115,16 @@ function boxesLogic(){
     }
 }
 
-let lastInsertFunctionText = 'kjashdisduhfncwhfkjsnchfiwehnkjshfkjsdhiu'
+let lastInsertFunctionText = 'jeremymattheudamonthegreat'
 let lastInsertFunctionTextAdded = '';
 let lastSelectionIndex = -1;
 function insertAtCursor(myField, myValue) {
-    console.log(`Added was ${myValue} with length ${myValue.length}`);
     let lastEditWasThisFunction = true;
     if (lastInsertFunctionText !== myField.value || myField.selectionStart !== lastSelectionIndex + lastInsertFunctionTextAdded.length)
         lastEditWasThisFunction = false;
     
+    let initialTextValue = myField.value
+
     //IE support
     if (document.selection) {
         myField.focus();
@@ -121,6 +158,7 @@ function insertAtCursor(myField, myValue) {
 
     lastInsertFunctionText = myField.value;
     lastInsertFunctionTextAdded = myValue;
+    undoRecord(initialTextValue)
 }
 
 function addImageData(width, height) {
