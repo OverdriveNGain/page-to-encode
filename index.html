@@ -15,7 +15,7 @@
 <body>
     <div id="controlsrow">
         <div id="contents">
-            <input type="file" id="file_input" onchange="onfilepick(event)">
+            <input type="file" id="file_input" onchange="onfilepick(event)" accept=".jpg,.png,.jpeg">
             <button onclick="ongeneratecallback()" id="generatebtn">Generate</button>
             <button onclick="newlinecallback()" id="newlinebtn">New Line</button>
             <button class="reset" onclick="onresetcallback('left')" id="resetleftbtn">◀ Reset Left</button>
@@ -49,6 +49,8 @@
             const image = new Image();
             image.onload = function() {
                 addImageData(this.width, this.height);
+                jsonresponse = {};
+                resetVars()
             }
             image.src = URL.createObjectURL(input.files[0]);
         }
